@@ -10,11 +10,11 @@ const isAuthenticated = require("../middlewares/isAuthenticated");
 router.get("/summary", isAuthenticated ,async (req, res, next) => {
 
   // console.log(req.payload)
-  const { id } = req.payload;
+  const { _id } = req.payload;
 
   try {
     const foundUser = await User.findById(id).populate("expenses")
-    const foundTransaction = await Transaction.find({ $or: [{ from: id }, { to: id }] })
+    const foundTransaction = await Transaction.find({ $or: [{ from: _id }, { to: _id }] })
 
     // console.log(foundTransaction)
 
@@ -27,11 +27,11 @@ router.get("/summary", isAuthenticated ,async (req, res, next) => {
 
 // GET '/api/account/profile' => to get the profile of the user
 router.get("/profile", isAuthenticated, async (req, res, next) => {
-  const { id } = req.payload;
-
+  const { _id } = req.payload;
+  console.log(req.payload)
   try {
-    const foundUser = await User.findById(id);
-
+    const foundUser = await User.findById(_id);
+    console.log(foundUser)
     res.json(foundUser);
   } catch (error) {
     next(error);
@@ -42,10 +42,10 @@ router.get("/profile", isAuthenticated, async (req, res, next) => {
 router.patch("/profile/edit-email", isAuthenticated, async (req, res, next) => {
 
   const { email } = req.body;
-  const { id } = req.payload;
+  const { _id } = req.payload;
 
   try {
-    const response = await User.findByIdAndUpdate(id, {email}, { new: true });
+    const response = await User.findByIdAndUpdate(_id, {email}, { new: true });
 
     res.json(response);
   } catch (error) {
