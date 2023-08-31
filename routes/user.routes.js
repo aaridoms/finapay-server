@@ -43,6 +43,12 @@ router.patch("/profile/edit-email", isAuthenticated, async (req, res, next) => {
 
   const { email } = req.body;
   const { _id } = req.payload;
+  const regexEmail = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g;
+
+  if(regexEmail.test(email) === false) {
+    res.status(400).json({ errorMessage: "Please, enter a valid email" });
+    return;
+  }
 
   try {
     const response = await User.findByIdAndUpdate(_id, {email}, { new: true });
