@@ -14,12 +14,13 @@ router.get("/summary", isAuthenticated ,async (req, res, next) => {
 
   try {
     const foundUser = await User.findById(_id).populate("expenses")
-    const foundTransaction = await Transaction.find({ $or: [{ from: _id }, { to: _id }] })
+    const foundTransaction = await Transaction.find({ $or: [{ from: _id }, { to: _id }] }).populate("from").populate("to")
+    const allUsers = await User.find({_id: { $ne: _id }})
 
     // console.log(foundTransaction)
 
 
-    res.json({foundUser,foundTransaction});
+    res.json({foundUser, foundTransaction, allUsers});
   } catch (error) {
     next(error);
   }
