@@ -13,8 +13,6 @@ const transactionSchema = new Schema(
     amount: {
       type: Number,
       required: [true, "Amount is required."],
-      unique: true,
-      lowercase: true,
       trim: true,
     },
     date: {

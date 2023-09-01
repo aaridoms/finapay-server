@@ -25,6 +25,20 @@ router.get("/summary", isAuthenticated ,async (req, res, next) => {
   }
 });
 
+// POST 'api/account/add-funds' => to add funds to the user
+router.post("/add-funds", isAuthenticated, async (req, res, next) => {
+
+  const { amount } = req.body;
+  const { _id } = req.payload;
+
+  try {
+    await User.findByIdAndUpdate(_id, { $inc: { funds: amount } }, { new: true });
+    res.json("Funds successfully added");
+  } catch (error) {
+    next(error);
+  }
+});
+
 // GET '/api/account/profile' => to get the profile of the user
 router.get("/profile", isAuthenticated, async (req, res, next) => {
   const { _id } = req.payload;
