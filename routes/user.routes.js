@@ -28,11 +28,11 @@ router.get("/summary", isAuthenticated ,async (req, res, next) => {
 // POST 'api/account/add-funds' => to add funds to the user
 router.post("/add-funds", isAuthenticated, async (req, res, next) => {
 
-  const { amount } = req.body;
+  const { funds } = req.body;
   const { _id } = req.payload;
 
   try {
-    await User.findByIdAndUpdate(_id, { $inc: { funds: amount } }, { new: true });
+    await User.findByIdAndUpdate(_id, { $inc: { funds: funds } }, { new: true });
     res.json("Funds successfully added");
   } catch (error) {
     next(error);
