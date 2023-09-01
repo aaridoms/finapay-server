@@ -13,4 +13,7 @@ router.use("/account", userRoutes);
 const transactionRoutes = require("./transaction.routes");
 router.use("/account", transactionRoutes);
 
+const expenseRoutes = require("./expense.routes");
+router.use("/account", expenseRoutes);
+
 module.exports = router;
