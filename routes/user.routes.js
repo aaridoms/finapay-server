@@ -13,13 +13,13 @@ router.get("/summary", isAuthenticated ,async (req, res, next) => {
   const { _id } = req.payload;
 
   try {
-    const foundUser = await User.findById(id).populate("expenses")
+    const foundUser = await User.findById(_id).populate("expenses")
     const foundTransaction = await Transaction.find({ $or: [{ from: _id }, { to: _id }] })
 
     // console.log(foundTransaction)
 
 
-    res.json("Falta mirarlo bien");
+    res.json({foundUser,foundTransaction});
   } catch (error) {
     next(error);
   }
