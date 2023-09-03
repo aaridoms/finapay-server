@@ -1,5 +1,7 @@
 const router = require("express").Router();
 
+const transporter = require('../config/transporter.config');
+
 const Transaction = require("../models/Transaction.model");
 const User = require("../models/User.model");
 
@@ -9,7 +11,7 @@ const isAuthenticated = require("../middlewares/isAuthenticated");
 router.post("/send", isAuthenticated, async (req, res, next) => {
   
   const { to, amount, concept } = req.body;
-  const { _id } = req.payload;
+  const { _id, username } = req.payload;
   
   try {
 
@@ -21,6 +23,23 @@ router.post("/send", isAuthenticated, async (req, res, next) => {
       to,
       amount,
       concept,
+    });
+
+    const emailTo = await User.findById(to).select("email");
+    const emailFrom = await User.findById(_id).select("email");
+
+    const usernameUpper = username.charAt(0).toUpperCase() + username.slice(1);
+
+    await transporter.sendMail({
+      from: process.env.GMAIL_USER,
+      to: emailTo.email,
+      subject: `You have received a new transaction from ${usernameUpper}`,
+      html: `<h1>You have received a new transaction</h1>
+      <p>From: ${emailFrom.email}</p>
+      <p>Amount: ${amount}€</p>
+      <p>Concept: ${concept}</p>
+      <img src="https://res.cloudinary.com/ddaezutq8/image/upload/v1693738024/finapayLogoSinFondo_eiisg7.png" alt="finapay" width="400px" />
+      `,
     });
 
     res.json("Transaction successfully created");
