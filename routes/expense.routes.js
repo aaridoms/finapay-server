@@ -64,11 +64,26 @@ router.delete("/expenses/:idExpense/delete", isAuthenticated, async (req, res, n
   const { _id } = req.payload;
 
   try {
-    const response = await Expense.findByIdAndDelete(idExpense);
+    await Expense.findByIdAndDelete(idExpense);
 
     await User.findByIdAndUpdate(_id, { $pull: { expenses: idExpense } });
 
     res.json("Expense successfully deleted");
+  } catch (error) {
+    next(error);
+  }
+});
+
+// PUT '/api/account/expenses/:idExpense/edit' => Edit a specific expense
+router.put("/expenses/:idExpense/edit", isAuthenticated, async (req, res, next) => {
+
+  const { idExpense } = req.params;
+  const { name, amount, category, notes } = req.body;
+
+  try {
+    await Expense.findByIdAndUpdate(idExpense, { name, amount, category, notes }, { new: true });
+
+    res.json("Expense successfully updated");
   } catch (error) {
     next(error);
   }

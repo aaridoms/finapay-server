@@ -7,7 +7,7 @@ const User = require("../models/User.model");
 
 const isAuthenticated = require("../middlewares/isAuthenticated");
 
-// POST 'api/account/send' => Crea una nueva transacción
+// POST 'api/account/send' => Crea una nueva transacción y envia un email al destinatario
 router.post("/send", isAuthenticated, async (req, res, next) => {
   
   const { to, amount, concept } = req.body;
