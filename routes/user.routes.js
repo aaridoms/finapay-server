@@ -74,4 +74,15 @@ router.patch("/profile/edit-email", isAuthenticated, async (req, res, next) => {
   }
 });
 
+// POST '/api/account/investment/join' => user can join an investment
+router.post("/investment/join", isAuthenticated, async (req, res, next) => {
+
+
+  try {
+    // const investmentType = await Investment.find
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

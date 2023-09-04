@@ -16,4 +16,7 @@ router.use("/account", transactionRoutes);
 const expenseRoutes = require("./expense.routes");
 router.use("/account", expenseRoutes);
 
+const investmentRoutes = require("./investment.routes");
+router.use("/account", investmentRoutes);
+
 module.exports = router;
