@@ -59,6 +59,7 @@ router.post(
     const { investmentId } = req.params;
     const { _id } = req.payload;
     const { amount } = req.body;
+
     try {
       const oneInvestment = await Investment.findById(investmentId);
       await User.findByIdAndUpdate(
@@ -71,8 +72,10 @@ router.post(
         { $push: { investments: investmentId } },
         { new: true }
       );
+
       let infoToUser = "";
       let youWon = null;
+
       const interval = setInterval(async () => {
         const randomNumber = Math.floor(Math.random() * 100);
         try {
@@ -84,7 +87,7 @@ router.post(
                 { $inc: { funds: newFunds } },
                 { new: true }
               );
-              infoToUser = `Your investment has been a success: You have won ${newFunds}`;
+              infoToUser += `Your investment has been a success: You have won ${newFunds}`;
               youWon = true;
             } else {
               const newFunds = amount * (1 + oneInvestment.interesRate * 0.01);
@@ -104,7 +107,7 @@ router.post(
                 { $inc: { funds: newFunds } },
                 { new: true }
               );
-              infoToUser = `Your investment has been a success: You have won ${newFunds}`;
+              infoToUser += `Your investment has been a success: You have won ${newFunds}`;
               youWon = true;
             } else {
               const newFunds = amount * (1 + oneInvestment.interesRate * 0.01);
@@ -113,7 +116,7 @@ router.post(
                 { $inc: { funds: newFunds } },
                 { new: true }
               );
-              infoToUser = `Your investment has been a failure: You have lost ${newFunds}`;
+              infoToUser += `Your investment has been a failure: You have lost ${newFunds}`;
               youWon = false;
             }
           } else if (oneInvestment.risk === "High") {
@@ -124,7 +127,7 @@ router.post(
                 { $inc: { funds: newFunds } },
                 { new: true }
               );
-              infoToUser = `Your investment has been a success: You have won ${newFunds}`;
+              infoToUser += `Your investment has been a success: You have won ${newFunds}`;
               youWon = true;
             } else {
               const newFunds = amount * (1 + oneInvestment.interesRate * 0.01);
@@ -133,7 +136,7 @@ router.post(
                 { $inc: { funds: newFunds } },
                 { new: true }
               );
-              infoToUser = `Your investment has been a failure: You have lost ${newFunds}`;
+              infoToUser += `Your investment has been a failure: You have lost ${newFunds}`;
               youWon = false;
             }
           }
@@ -145,7 +148,7 @@ router.post(
 
       res
         .status(201)
-        .json("Investment joined successfully", { infoToUser, youWon });
+        .json( "joined" );
     } catch (error) {
       next(error);
     }
