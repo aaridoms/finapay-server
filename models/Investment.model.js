@@ -8,7 +8,7 @@ const investmentSchema = new Schema(
     },
     amount: {
       type: Number,
-      required: [true, 'Amount is required.'],
+      default: 0,
     },
     risk: {
       type: String,
