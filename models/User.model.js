@@ -29,9 +29,9 @@ const userSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Expense'
     }],
-    investments: [{
+    operation: [{
       type: Schema.Types.ObjectId,
-      ref: 'Investment'
+      ref: 'Operation'
     }],
     funds: {
       type: Number,

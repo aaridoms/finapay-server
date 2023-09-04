@@ -4,36 +4,45 @@ const investmentSchema = new Schema(
   {
     name: {
       type: String,
-      required: [true, 'Name is required'],
-    },
-    amount: {
-      type: Number,
-      default: 0,
+      required: [true, "Name is required"],
     },
     risk: {
       type: String,
-      enum: ['Low', 'Medium', 'High'],
-      required: [true, 'Risk is required.']
+      enum: ["Low", "Medium", "High"],
+      required: [true, "Risk is required."],
     },
     interesRate: {
       type: Number,
-      required: [true, 'Interest Rate is required.'],
+      required: [true, "Interest Rate is required."],
     },
     category: {
       type: [String],
-      enum: ['Stocks', 'Bonds', 'Mutual Funds', 'ETFs', 'Real Estate', 'Commodities', 'Cryptocurrency', 'Cash Equivalents'],
-      required: [true, 'Category is required.']
+      enum: [
+        "Stocks",
+        "Bonds",
+        "Mutual Funds",
+        "ETFs",
+        "Real Estate",
+        "Commodities",
+        "Cryptocurrency",
+        "Cash Equivalents",
+      ],
+      required: [true, "Category is required."],
     },
     duration: {
       type: Number,
-      required: [true, 'Duration is required.'],
+      required: [true, "Duration is required."],
     },
     notes: {
       type: String,
-    }
+    },
+    users: [{
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    }],
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 

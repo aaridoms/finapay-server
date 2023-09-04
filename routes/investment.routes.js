@@ -4,7 +4,7 @@ const isAuthenticated = require("../middlewares/isAuthenticated");
 
 const Investment = require("../models/Investment.model");
 const User = require("../models/User.model");
-
+const Operation = require("../models/Operation.model");
 // GET '/api/account/investments' => Get all investments
 router.get("/investments", isAuthenticated, async (req, res, next) => {
   try {
@@ -62,19 +62,24 @@ router.post(
 
     try {
       const oneInvestment = await Investment.findById(investmentId);
-      await User.findByIdAndUpdate(
-        _id,
-        { $inc: { funds: -amount } },
-        { new: true }
-      );
-      await User.findByIdAndUpdate(
-        _id,
-        { $push: { investments: investmentId } },
-        { new: true }
-      );
 
-      let infoToUser = "";
-      let youWon = null;
+      const userFunds = await User.findById(_id).select({ funds: 1 });
+
+      if (userFunds.funds < amount) {
+        res.status(400).json({ errorMessage: "You do not have enough funds" });
+        return;
+      }
+
+      const newOperation = await Operation.create({
+        amount,
+      });
+
+      const operationID = newOperation._id;
+      await User.findByIdAndUpdate(
+        _id,
+        { $inc: { funds: -amount }, $push: { operation: operationID } },
+        { new: true }
+      );
 
       const interval = setInterval(async () => {
         const randomNumber = Math.floor(Math.random() * 100);
@@ -82,13 +87,17 @@ router.post(
           if (oneInvestment.risk === "Low") {
             if (randomNumber <= 3) {
               const newFunds = amount * (1 - oneInvestment.interesRate * 0.01);
+              
+              await Operation.findByIdAndUpdate(
+                operationID,
+                { status: "Completed" , earnings: newFunds-amount },
+                { new: true }
+              );
               await User.findByIdAndUpdate(
                 _id,
                 { $inc: { funds: newFunds } },
                 { new: true }
               );
-              infoToUser += `Your investment has been a success: You have won ${newFunds}`;
-              youWon = true;
             } else {
               const newFunds = amount * (1 + oneInvestment.interesRate * 0.01);
               await User.findByIdAndUpdate(
@@ -96,8 +105,11 @@ router.post(
                 { $inc: { funds: newFunds } },
                 { new: true }
               );
-              infoToUser = `Your investment has been a failure: You have lost ${newFunds}`;
-              youWon = false;
+              await Operation.findByIdAndUpdate(
+                operationID,
+                { status: "Completed" , earnings: newFunds-amount },
+                { new: true }
+              );
             }
           } else if (oneInvestment.risk === "Medium") {
             if (randomNumber <= 10) {
@@ -107,8 +119,11 @@ router.post(
                 { $inc: { funds: newFunds } },
                 { new: true }
               );
-              infoToUser += `Your investment has been a success: You have won ${newFunds}`;
-              youWon = true;
+              await Operation.findByIdAndUpdate(
+                operationID,
+                { status: "Completed" , earnings: newFunds-amount },
+                { new: true }
+              );
             } else {
               const newFunds = amount * (1 + oneInvestment.interesRate * 0.01);
               await User.findByIdAndUpdate(
@@ -116,8 +131,11 @@ router.post(
                 { $inc: { funds: newFunds } },
                 { new: true }
               );
-              infoToUser += `Your investment has been a failure: You have lost ${newFunds}`;
-              youWon = false;
+              await Operation.findByIdAndUpdate(
+                operationID,
+                { status: "Completed" , earnings: newFunds-amount },
+                { new: true }
+              );
             }
           } else if (oneInvestment.risk === "High") {
             if (randomNumber <= 25) {
@@ -127,8 +145,11 @@ router.post(
                 { $inc: { funds: newFunds } },
                 { new: true }
               );
-              infoToUser += `Your investment has been a success: You have won ${newFunds}`;
-              youWon = true;
+              await Operation.findByIdAndUpdate(
+                operationID,
+                { status: "Completed" , earnings: newFunds-amount },
+                { new: true }
+              );
             } else {
               const newFunds = amount * (1 + oneInvestment.interesRate * 0.01);
               await User.findByIdAndUpdate(
@@ -136,19 +157,28 @@ router.post(
                 { $inc: { funds: newFunds } },
                 { new: true }
               );
-              infoToUser += `Your investment has been a failure: You have lost ${newFunds}`;
-              youWon = false;
+              await Operation.findByIdAndUpdate(
+                operationID,
+                { status: "Completed" , earnings: newFunds-amount },
+                { new: true }
+              );
             }
           }
           clearInterval(interval);
         } catch (error) {
           console.log(error);
+          await User.findByIdAndUpdate(
+            _id,
+            { $inc: { amount } },
+            { new: true }
+          );
+          await Operation.findByIdAndUpdate(operationID, {
+            status: "Failed",
+          });
         }
       }, 1000 * oneInvestment.duration);
 
-      res
-        .status(201)
-        .json( "joined" );
+      res.status(201).json("joined");
     } catch (error) {
       next(error);
     }
@@ -163,8 +193,8 @@ router.get(
     const { _id } = req.payload;
 
     try {
-      const userInvestments = await User.findById(_id).populate("investments");
-      res.status(200).json(userInvestments.investments);
+      const userInvestments = await User.findById(_id).populate("operation");
+      res.status(200).json(userInvestments.operation);
     } catch (error) {
       next(error);
     }

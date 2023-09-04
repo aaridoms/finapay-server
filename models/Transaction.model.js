@@ -22,6 +22,7 @@ const transactionSchema = new Schema(
     concept: {
       type: String,
     },
+  
   },
   {
     timestamps: true,
