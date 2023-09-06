@@ -34,6 +34,16 @@ router.post("/add-funds", isAuthenticated, async (req, res, next) => {
   const { funds } = req.body;
   const { _id } = req.payload;
 
+  if(!funds) {
+    res.status(400).json({ errorMessage: "Please, fill in all fields" });
+    return;
+  }
+
+  if (funds <= 0) {
+    res.status(400).json({ errorMessage: "Funds must be greater than 0" });
+    return;
+  }
+
   try {
     await User.findByIdAndUpdate(_id, { $inc: { funds: funds } }, { new: true });
     res.json("Funds successfully added");
@@ -49,7 +59,7 @@ router.get("/profile", isAuthenticated, async (req, res, next) => {
   try {
     const foundUser = await User.findById(_id);
     console.log(foundUser)
-    res.json(foundUser);
+    res.status(200).json(foundUser);
   } catch (error) {
     next(error);
   }
@@ -62,6 +72,11 @@ router.patch("/profile/edit-email", isAuthenticated, async (req, res, next) => {
   const { _id } = req.payload;
   const regexEmail = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g;
 
+  if(!email) {
+    res.status(400).json({ errorMessage: "Please, fill the email field" });
+    return;
+  }
+
   if(regexEmail.test(email) === false) {
     res.status(400).json({ errorMessage: "Please, enter a valid email" });
     return;
@@ -70,7 +85,7 @@ router.patch("/profile/edit-email", isAuthenticated, async (req, res, next) => {
   try {
     const response = await User.findByIdAndUpdate(_id, {email}, { new: true });
 
-    res.json(response);
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }

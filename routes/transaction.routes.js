@@ -12,11 +12,26 @@ router.post("/send", isAuthenticated, async (req, res, next) => {
   
   const { to, amount, concept } = req.body;
   const { _id, username } = req.payload;
+
+  if (!to || !amount || !concept) {
+    res.status(400).json({ errorMessage: "Please, fill in all fields" });
+    return;
+  }
+
+  if (amount <= 0) {
+    res.status(400).json({ errorMessage: "Amount must be greater than 0" });
+    return;
+  }
   
   try {
 
-    await User.findByIdAndUpdate(_id, { $inc: { funds: -amount } }, { new: true });
+    const fromUser = await User.findByIdAndUpdate(_id, { $inc: { funds: -amount } }, { new: true });
     await User.findByIdAndUpdate(to, { $inc: { funds: amount } }, { new: true });
+
+    if (fromUser.funds < amount) {
+      res.status(400).json({ errorMessage: "You don't have enough funds" });
+      return;
+    }
 
     await Transaction.create({
       from: _id,
@@ -42,7 +57,7 @@ router.post("/send", isAuthenticated, async (req, res, next) => {
       `,
     });
 
-    res.json("Transaction successfully created");
+    res.status(200).json("Transaction successfully created");
   } catch (error) {
     next(error);
   }

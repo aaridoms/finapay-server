@@ -19,6 +19,21 @@ router.get("/investments", isAuthenticated, async (req, res, next) => {
 router.post("/investments/add", isAuthenticated, async (req, res, next) => {
   const { name, risk, interesRate, category, duration, notes } = req.body;
 
+  if(!name || !risk || !interesRate || !category || !duration || !notes) {
+    res.status(400).json({ errorMessage: "Please, fill in all fields" });
+    return;
+  }
+
+  if (interesRate <= 0) {
+    res.status(400).json({ errorMessage: "Interest rate must be greater than 0" });
+    return;
+  }
+
+  if (duration <= 0) {
+    res.status(400).json({ errorMessage: "Duration must be greater than 0" });
+    return;
+  }
+
   try {
     await Investment.create({
       name,
@@ -29,7 +44,7 @@ router.post("/investments/add", isAuthenticated, async (req, res, next) => {
       notes,
     });
 
-    res.status(201).json("Investment created successfully");
+    res.status(200).json("Investment created successfully");
   } catch (error) {
     next(error);
   }

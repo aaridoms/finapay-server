@@ -11,7 +11,7 @@ router.get("/expenses", isAuthenticated, async (req, res, next) => {
   try {
     const response = await User.findById(_id).populate("expenses");
     // console.log(response)
-    res.json(response);
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }
@@ -26,7 +26,7 @@ router.get(
 
     try {
       const response = await Expense.findById(idExpense);
-      res.json(response);
+      res.status(200).json(response);
     } catch (error) {
       next(error);
     }
@@ -37,6 +37,11 @@ router.get(
 router.post("/expenses/add", isAuthenticated, async (req, res, next) => {
   const { name, amount, category, notes } = req.body;
   const { _id } = req.payload;
+
+  if(!name || !amount || !category) {
+    res.status(400).json({ errorMessage: "Please, fill in all fields" });
+    return;
+  }
 
   try {
     const response = await Expense.create({
@@ -51,7 +56,7 @@ router.post("/expenses/add", isAuthenticated, async (req, res, next) => {
     await User.findByIdAndUpdate(_id, { $push: { expenses: response._id } },{ new: true }
     );
 
-    res.json("Expense successfully created");
+    res.status(200).json("Expense successfully created");
   } catch (error) {
     next(error);
   }
@@ -68,7 +73,7 @@ router.delete("/expenses/:idExpense/delete", isAuthenticated, async (req, res, n
 
     await User.findByIdAndUpdate(_id, { $pull: { expenses: idExpense } });
 
-    res.json("Expense successfully deleted");
+    res.status(200).json("Expense successfully deleted");
   } catch (error) {
     next(error);
   }
@@ -80,10 +85,15 @@ router.put("/expenses/:idExpense/edit", isAuthenticated, async (req, res, next) 
   const { idExpense } = req.params;
   const { name, amount, category, notes } = req.body;
 
+  if(!name || !amount || !category) {
+    res.status(400).json({ errorMessage: "Please, fill in all fields" });
+    return;
+  }
+
   try {
     await Expense.findByIdAndUpdate(idExpense, { name, amount, category, notes }, { new: true });
 
-    res.json("Expense successfully updated");
+    res.status(200).json("Expense successfully updated");
   } catch (error) {
     next(error);
   }
