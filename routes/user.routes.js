@@ -16,7 +16,7 @@ router.get("/summary", isAuthenticated ,async (req, res, next) => {
 
   try {
     const foundUser = await User.findById(_id).populate("expenses")
-    const foundTransaction = await Transaction.find({ $or: [{ from: _id }, { to: _id }] }).populate("from").populate("to")
+    const foundTransaction = await Transaction.find({ $or: [{ from: _id }, { to: _id }] }).populate("from").populate("to").sort({ createdAt: -1 })
     const allUsers = await User.find({_id: { $ne: _id }})
 
     // console.log(foundTransaction)

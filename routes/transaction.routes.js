@@ -24,11 +24,11 @@ router.post("/send", isAuthenticated, async (req, res, next) => {
   }
   
   try {
-
-    const fromUser = await User.findByIdAndUpdate(_id, { $inc: { funds: -amount } }, { new: true });
+    const userfunds = await User.findById(_id).select("funds");
+    await User.findByIdAndUpdate(_id, { $inc: { funds: -amount } }, { new: true });
     await User.findByIdAndUpdate(to, { $inc: { funds: amount } }, { new: true });
 
-    if (fromUser.funds < amount) {
+    if (userfunds.funds < amount) {
       res.status(400).json({ errorMessage: "You don't have enough funds" });
       return;
     }
