@@ -75,6 +75,16 @@ router.post(
     const { _id } = req.payload;
     const { amount } = req.body;
 
+    if (!amount) {
+      res.status(400).json({ errorMessage: "Please, fill in all fields" });
+      return;
+    }
+
+    if (amount <= 0) {
+      res.status(400).json({ errorMessage: "Amount must be greater than 0" });
+      return;
+    }
+
     try {
       const oneInvestment = await Investment.findById(investmentId);
 
@@ -208,8 +218,11 @@ router.get(
     const { _id } = req.payload;
 
     try {
-      const userInvestments = await User.findById(_id).populate("operation").sort({ createdAt: -1 });
-      res.status(200).json(userInvestments.operation);
+      const userInvestments = await User.findById(_id).populate("operation");
+      const sortedOperation = userInvestments.operation.sort((a, b) => {
+        return b.createdAt - a.createdAt;
+      })
+      res.status(200).json(sortedOperation);
     } catch (error) {
       next(error);
     }
