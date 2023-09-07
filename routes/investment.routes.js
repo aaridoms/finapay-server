@@ -208,7 +208,7 @@ router.get(
     const { _id } = req.payload;
 
     try {
-      const userInvestments = await User.findById(_id).populate("operation");
+      const userInvestments = await User.findById(_id).populate("operation").sort({ createdAt: -1 });
       res.status(200).json(userInvestments.operation);
     } catch (error) {
       next(error);
