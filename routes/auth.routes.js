@@ -55,7 +55,7 @@ router.post("/signup", async (req, res, next) => {
 // POST 'api/auth/login' => Inicia sesión con un usuario existente
 router.post("/login", async (req, res, next) => {
   
-  const { email, password } = req.body;
+  const { email, password, isChecked } = req.body;
 
   if (!email || !password) {
     res.status(400).json({ errorMessage: "Please, fill in all fields" });
@@ -83,8 +83,17 @@ router.post("/login", async (req, res, next) => {
       username: foundUser.username,
     };
 
-    const authToken = jwt.sign(payload, process.env.SECRET_TOKEN,
-      { expiresIn: "1d", algorithm: "HS256" });
+    let authToken;
+
+    if(isChecked === true) {
+      authToken = jwt.sign(payload, process.env.SECRET_TOKEN,
+        { expiresIn: "7d", algorithm: "HS256" });
+
+    } else {
+      authToken = jwt.sign(payload, process.env.SECRET_TOKEN,
+        { expiresIn: "1h", algorithm: "HS256" });
+    }
+
 
     res.json({ authToken });
 
@@ -95,7 +104,6 @@ router.post("/login", async (req, res, next) => {
 
 // GET 'api/auth/verify' => Verifica si el usuario está logueado
 router.get("/verify", isAuthenticated, (req, res, next) => {
-  console.log(req.payload);
 
   res.json(req.payload);
 });

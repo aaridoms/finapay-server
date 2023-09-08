@@ -10,7 +10,6 @@ router.get("/expenses", isAuthenticated, async (req, res, next) => {
 
   try {
     const response = await User.findById(_id).populate("expenses");
-    // console.log(response)
     res.status(200).json(response);
   } catch (error) {
     next(error);
@@ -50,8 +49,6 @@ router.post("/expenses/add", isAuthenticated, async (req, res, next) => {
       category,
       notes,
     });
-
-    // console.log(response);
 
     await User.findByIdAndUpdate(_id, { $push: { expenses: response._id } },{ new: true }
     );

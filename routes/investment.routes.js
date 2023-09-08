@@ -5,6 +5,7 @@ const isAuthenticated = require("../middlewares/isAuthenticated");
 const Investment = require("../models/Investment.model");
 const User = require("../models/User.model");
 const Operation = require("../models/Operation.model");
+
 // GET '/api/account/investments' => Get all investments
 router.get("/investments", isAuthenticated, async (req, res, next) => {
   try {

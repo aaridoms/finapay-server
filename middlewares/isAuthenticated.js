@@ -7,16 +7,13 @@ const isAuthenticated = jwt({
 
   getToken: (req) => {
     if(req.headers === undefined || req.headers.authorization === undefined) {
-      console.log("No token found");
       return null;
     }
 
     const [bearer, token] = req.headers.authorization.split(' ');
     if(bearer !== 'Bearer') {
-      console.log("No token found");
       return null;
     }
-    console.log("Token found")
     return token;
   }
 });
