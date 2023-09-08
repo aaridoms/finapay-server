@@ -230,4 +230,17 @@ router.get(
   }
 );
 
+// DELETE '/api/account/investments/:investmentId/delete' => Delete an investment
+router.delete("/investments/:investmentId/delete", isAuthenticated, async (req, res, next) => {
+  
+  const { investmentId } = req.params;
+
+  try {
+    await Investment.findByIdAndDelete(investmentId);
+    res.status(200).json("Investment deleted successfully");
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;
